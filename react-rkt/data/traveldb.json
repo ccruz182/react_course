@@ -1,0 +1,11 @@
+{
+  "destination": [
+    {
+      "city": "Mexico City",
+      "country": "Mexico",
+      "id": "2c-t5jEbv3w",
+      "daysNeeded": 7
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
