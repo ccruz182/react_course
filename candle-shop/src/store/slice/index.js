@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { baseAPI } from "../api/baseAPI";
-import cartReducer from "./cartSlice"
+import cartReducer from "./cartSlice";
+import authReducer from "./authSlice";
 
 const loadCartFromStorage = () => {
     try {
@@ -14,7 +15,8 @@ const loadCartFromStorage = () => {
 export const store = configureStore({
     reducer: {
         [baseAPI.reducerPath]: baseAPI.reducer,
-        cart: cartReducer
+        cart: cartReducer,
+        auth: authReducer,
     },
     preloadedState: {
         cart: loadCartFromStorage()

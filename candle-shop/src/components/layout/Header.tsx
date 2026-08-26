@@ -1,11 +1,28 @@
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 import { ROUTES } from "../../utility/constants";
+import { clearUser } from "../../store/slice/authSlice";
+import { useLogoutUserMutation } from "../../store/api/authAPI";
 
 const Header = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { totalQuantity } = useSelector(state => state.cart);
+    const { isAuthenticated, user, isInitialized } = useSelector(state => state.auth);
+    const [logoutUser] = useLogoutUserMutation();
+
+
+    const handleLogout = async () => {
+        try {
+            await logoutUser();
+        } catch (error) {
+            dispatch(clearUser())
+        } finally {
+            navigate(ROUTES.HOME)
+        }
+    }
 
     return (
         <nav className="navbar navbar-expand-sm pt-3 border-bottom shadow-sm">
@@ -63,65 +80,85 @@ const Header = () => {
                             </button>
                         </li>
 
-                        <li className="nav-item dropdown">
-                            <button
-                                className="nav-link dropdown-toggle btn btn-link"
-                                type="button"
-                                id="navbarDropdown"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                <i className="bi bi-person me-1"></i>
-                                User
-                            </button>
-                            <ul
-                                className="dropdown-menu dropdown-menu-end"
-                                aria-labelledby="navbarDropdown"
-                                style={{ minWidth: "200px" }}
-                            >
-                                <li>
-                                    <Link className="dropdown-item" to={ROUTES.MY_ORDER}>
-                                        <i className="bi bi-cart me-2"></i>
-                                        My Orders
-                                    </Link>
-                                </li>
-                                <li>
-                                    <hr className="dropdown-divider" />
-                                </li>
-                                <li>
-                                    <Link className="dropdown-item" to={ROUTES.ADMIN.PRODUCTS}>
-                                        <i className="bi bi-box me-2"></i>
-                                        Manage Products
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link className="dropdown-item" to={ROUTES.ADMIN.ORDERS}>
-                                        <i className="bi bi-clipboard-data me-2"></i>
-                                        Manage Orders
-                                    </Link>
-                                </li>
-                                <li>
-                                    <hr className="dropdown-divider" />
-                                </li>
-                                <li>
-                                    <button className="dropdown-item" onclick="logout()">
-                                        <i className="bi bi-box-arrow-right me-2"></i>
-                                        Logout
-                                    </button>
-                                </li>
-                            </ul>
-                        </li>
+                        {!isInitialized ? (
+                            <li className="nav-item">
+                                <span className="nav-link disabled">
+                                    <div className="d-flex align-items-center">
+                                        <div
+                                            className="spinner-border spinner-border-sm me-2"
+                                            role="status"
+                                            aria-hidden="true"
+                                        ></div>
+                                        <span>Loading...</span>
+                                    </div>
+                                </span>
+                            </li>
+                        ) : isAuthenticated ? (
+                            <li className="nav-item dropdown">
+                                <button
+                                    className="nav-link dropdown-toggle btn btn-link"
+                                    type="button"
+                                    id="navbarDropdown"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    <i className="bi bi-person me-1"></i>
+                                    {user?.displayName}
+                                </button>
+                                <ul
+                                    className="dropdown-menu dropdown-menu-end"
+                                    aria-labelledby="navbarDropdown"
+                                    style={{ minWidth: "200px" }}
+                                >
+                                    <li>
+                                        <Link className="dropdown-item" to={ROUTES.MY_ORDER}>
+                                            <i className="bi bi-cart me-2"></i>
+                                            My Orders
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <hr className="dropdown-divider" />
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to={ROUTES.ADMIN.PRODUCTS}>
+                                            <i className="bi bi-box me-2"></i>
+                                            Manage Products
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to={ROUTES.ADMIN.ORDERS}>
+                                            <i className="bi bi-clipboard-data me-2"></i>
+                                            Manage Orders
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <hr className="dropdown-divider" />
+                                    </li>
+                                    <li>
+                                        <button className="dropdown-item" onClick={handleLogout}>
+                                            <i className="bi bi-box-arrow-right me-2"></i>
+                                            Logout
+                                        </button>
+                                    </li>
+                                </ul>
+                            </li>
+                        ) : (<>
+                            <li className="nav-item me-2" >
+                                <Link className="nav-link px-4 py-2" to={ROUTES.LOGIN}>
+                                    Login
+                                </Link>
+                            </li>
+                            <li className="nav-item" >
+                                <Link className="nav-link px-0 py-2" to={ROUTES.REGISTER}>
+                                    Sign Up
+                                </Link>
+                            </li>
+                        </>)}
 
-                        <li className="nav-item me-2" >
-                            <Link className="nav-link px-4 py-2" to={ROUTES.LOGIN}>
-                                Login
-                            </Link>
-                        </li>
-                        <li className="nav-item" >
-                            <Link className="nav-link px-0 py-2" to={ROUTES.REGISTER}>
-                                Sign Up
-                            </Link>
-                        </li>
+
+
+
+
                     </ul>
                 </div>
             </div>
